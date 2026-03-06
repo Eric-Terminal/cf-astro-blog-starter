@@ -6,27 +6,29 @@ const currentPath = Astro.url.pathname;
 ---
 
 <header class="site-header">
-	<nav class="site-nav glass-panel" transition:persist>
-		<a href="/" class="site-brand" aria-label={siteConfig.name}>
-			<span class="site-brand-mark">E</span>
-			<span class="site-brand-copy">
-				<strong>{siteConfig.name}</strong>
-				<small>流畅、克制、持续更新的技术写作</small>
-			</span>
-		</a>
-		<ul class="nav-links">
-			<li>
-				<a href="/" class:list={["nav-link", { active: currentPath === "/" }]}>首页</a>
-			</li>
-			<li>
-				<a href="/blog" class:list={["nav-link", { active: currentPath.startsWith("/blog") }]}>归档</a>
-			</li>
-			<li>
-				<a href="/search" class:list={["nav-link", { active: currentPath === "/search" }]}>搜索</a>
-			</li>
-		</ul>
-		<div class="nav-actions">
-			<ThemeToggle />
+	<nav class="site-nav" transition:persist>
+		<div class="site-nav-shell">
+			<a href="/" class="site-brand" aria-label={siteConfig.name}>
+				<span class="site-brand-mark">E</span>
+				<span class="site-brand-copy">
+					<strong>{siteConfig.name}</strong>
+					<small>流畅、克制、持续更新的技术写作</small>
+				</span>
+			</a>
+			<ul class="nav-links">
+				<li>
+					<a href="/" class:list={["nav-link", { active: currentPath === "/" }]}>首页</a>
+				</li>
+				<li>
+					<a href="/blog" class:list={["nav-link", { active: currentPath.startsWith("/blog") }]}>归档</a>
+				</li>
+				<li>
+					<a href="/search" class:list={["nav-link", { active: currentPath === "/search" }]}>搜索</a>
+				</li>
+			</ul>
+			<div class="nav-actions">
+				<ThemeToggle />
+			</div>
 		</div>
 	</nav>
 </header>
@@ -47,48 +49,54 @@ const currentPath = Astro.url.pathname;
 	}
 
 	.site-nav {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-		align-items: center;
-		gap: var(--space-md);
+		position: relative;
 		width: 100%;
-		max-width: none;
-		margin-inline: auto;
-		padding:
-			0.9rem
-			calc(1.4rem + env(safe-area-inset-right))
-			1rem
-			calc(1.4rem + env(safe-area-inset-left));
+		pointer-events: none;
+		isolation: isolate;
+		contain: paint;
+	}
+
+	.site-nav::before {
+		content: "";
+		position: absolute;
+		inset: 0;
 		border-top: none;
 		border-left: none;
 		border-right: none;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 		border-radius: 0;
-		background: rgba(255, 255, 255, 0.16);
+		background: rgba(255, 255, 255, 0.14);
 		box-shadow: 0 10px 24px -26px rgba(8, 18, 34, 0.18);
-		pointer-events: auto;
+		backdrop-filter: blur(14px) saturate(125%);
+		-webkit-backdrop-filter: blur(14px) saturate(125%);
 		transform-origin: top center;
 		transform: translate3d(0, 0, 0);
 		backface-visibility: hidden;
-		will-change:
-			width,
-			max-width,
-			margin,
-			padding,
-			border-radius,
-			transform,
-			box-shadow;
+		will-change: inset, border-radius, transform, box-shadow;
 		transition:
-			width var(--nav-motion-main),
-			max-width var(--nav-motion-main),
-			padding var(--nav-motion-main),
+			inset var(--nav-motion-main),
 			border-radius var(--nav-motion-main),
 			background-color var(--nav-motion-surface),
 			border-color var(--nav-motion-surface),
 			box-shadow var(--nav-motion-surface),
-			backdrop-filter var(--nav-motion-surface),
-			-webkit-backdrop-filter var(--nav-motion-surface),
 			transform var(--nav-motion-transform);
+	}
+
+	.site-nav-shell {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		align-items: center;
+		gap: var(--space-md);
+		width: min(100%, 1060px);
+		margin-inline: auto;
+		padding:
+			0.88rem
+			calc(1.18rem + env(safe-area-inset-right))
+			0.96rem
+			calc(1.18rem + env(safe-area-inset-left));
+		pointer-events: auto;
 	}
 
 	.site-brand {
@@ -185,17 +193,12 @@ const currentPath = Astro.url.pathname;
 		padding-inline: 0.8rem;
 	}
 
-	:global(html[data-nav-condensed]) .site-nav {
-		width: min(calc(100% - 1.6rem), 1060px);
-		max-width: 1060px;
-		margin-inline: auto;
-		padding: 0.72rem 1rem;
+	:global(html[data-nav-condensed]) .site-nav::before {
+		inset-inline: max(0.8rem, calc((100% - 1060px) / 2));
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		border-radius: 999px;
 		background: rgba(255, 255, 255, 0.12);
 		box-shadow: 0 18px 38px -28px rgba(8, 18, 34, 0.24);
-		backdrop-filter: blur(16px) saturate(130%);
-		-webkit-backdrop-filter: blur(16px) saturate(130%);
 		transform: translate3d(0, 0, 0) scale(0.992);
 	}
 
@@ -211,18 +214,19 @@ const currentPath = Astro.url.pathname;
 		}
 
 		.site-nav {
+			width: 100%;
+		}
+
+		.site-nav-shell {
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: center;
 			width: 100%;
-			max-width: none;
-			margin-inline: auto;
 			padding:
 				0.82rem
 				calc(0.9rem + env(safe-area-inset-right))
 				0.95rem
 				calc(0.9rem + env(safe-area-inset-left));
-			border-radius: 0;
 		}
 
 		.site-brand {
@@ -254,19 +258,16 @@ const currentPath = Astro.url.pathname;
 			padding-inline: 0.5rem;
 		}
 
-		:global(html[data-nav-condensed]) .site-nav {
-			width: calc(100% - 1rem);
-			max-width: none;
-			padding: 0.78rem 0.88rem;
+		:global(html[data-nav-condensed]) .site-nav::before {
+			inset-inline: 0.5rem;
 			border-radius: 28px;
 			transform: none;
 		}
 	}
 
 	@media (max-width: 640px) {
-		.site-nav {
+		.site-nav-shell {
 			padding: 0.8rem;
-			border-radius: 0;
 		}
 
 		.nav-links,
@@ -281,9 +282,8 @@ const currentPath = Astro.url.pathname;
 			padding-inline: 0.88rem;
 		}
 
-		:global(html[data-nav-condensed]) .site-nav {
+		:global(html[data-nav-condensed]) .site-nav::before {
 			border-radius: 24px;
-			transform: none;
 		}
 	}
 </style>
