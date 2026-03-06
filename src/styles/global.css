@@ -40,9 +40,9 @@
 	--radius-lg: 32px;
 	--radius-xl: 40px;
 	--radius-pill: 999px;
-	--radius-panel: 34px 34px 46px 46px / 28px 28px 52px 52px;
-	--radius-card: 26px 26px 34px 34px / 22px 22px 38px 38px;
-	--radius-inner: 22px 22px 28px 28px / 18px 18px 32px 32px;
+	--radius-panel: 34px;
+	--radius-card: 28px;
+	--radius-inner: 24px;
 	--shadow-soft:
 		0 18px 48px -28px var(--color-shadow), 0 10px 18px -14px var(--color-shadow);
 	--shadow-card:
@@ -665,7 +665,7 @@ pre code {
 	}
 
 	.glass-panel {
-		border-radius: 26px 26px 34px 34px / 22px 22px 38px 38px;
+		border-radius: var(--radius-card);
 		backdrop-filter: blur(26px) saturate(150%);
 		-webkit-backdrop-filter: blur(26px) saturate(150%);
 	}
