@@ -50,7 +50,7 @@ tests/
 推荐使用 `Node.js 22+` 和 `npm`。
 
 ```bash
-git clone https://github.com/h1n054ur/cf-astro-blog-starter.git
+git clone https://github.com/Eric-Terminal/cf-astro-blog-starter.git
 cd cf-astro-blog-starter
 npm install
 cp .dev.vars.example .dev.vars

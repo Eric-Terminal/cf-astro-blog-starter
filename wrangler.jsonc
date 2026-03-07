@@ -39,7 +39,7 @@
 
 	"vars": {
 		"SITE_NAME": "My Blog",
-		"SITE_URL": "https://cf-astro-blog-starter.h1n054ur.dev",
+		"SITE_URL": "https://blog.ericterminal.com",
 		"TURNSTILE_SITE_KEY": ""
 	}
 

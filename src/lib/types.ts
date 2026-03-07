@@ -22,7 +22,7 @@ export interface CommentConfig {
 
 export const siteConfig: SiteConfig = {
 	name: "Eric-Terminal 的博客",
-	url: "https://cf-astro-blog-starter.h1n054ur.dev",
+	url: "https://blog.ericterminal.com",
 	description: "记录 Cloudflare、前端工程、系统设计与长期有效的技术经验。",
 	author: "Eric",
 	language: "zh-CN",
