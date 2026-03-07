@@ -120,14 +120,6 @@ function isInternalHref(href: string) {
 				<span>最近更新</span>
 				<strong>{latestUpdate}</strong>
 			</div>
-			<div class="hero-metric">
-				<span>关注主题</span>
-				<strong>{homepageAppearance.heroTopicText}</strong>
-			</div>
-			<div class="hero-metric">
-				<span>写作方式</span>
-				<strong>{homepageAppearance.heroWritingText}</strong>
-			</div>
 		</div>
 	</section>
 
@@ -496,16 +488,8 @@ function isInternalHref(href: string) {
 			box-shadow 220ms ease;
 	}
 
-	.hero-metric:nth-of-type(2) {
-		animation-delay: 200ms;
-	}
-
-	.hero-metric:nth-of-type(3) {
-		animation-delay: 260ms;
-	}
-
-	.hero-metric:nth-of-type(4) {
-		animation-delay: 320ms;
+	.hero-metric {
+		animation-delay: 220ms;
 	}
 
 	.hero-metric:hover {
