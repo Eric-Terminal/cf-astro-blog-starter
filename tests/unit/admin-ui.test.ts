@@ -60,4 +60,19 @@ describe("后台界面风格保护", () => {
 		assert.match(adminScriptSource, /\[data-cover-key-input='true'\]/u);
 		assert.match(adminScriptSource, /uploader\.closest\("\.form-group"\)/u);
 	});
+
+	test("外观页首屏图片预留位支持拖拽上传并自动回填路径", async () => {
+		const [appearanceSource, adminScriptSource] = await Promise.all([
+			readFile("src/admin/routes/appearance.ts", "utf8"),
+			readFile("public/admin.js", "utf8"),
+		]);
+
+		assert.match(appearanceSource, /data-hero-image-uploader="true"/u);
+		assert.match(appearanceSource, /data-hero-image-dropzone="true"/u);
+		assert.match(appearanceSource, /data-hero-image-path-input="true"/u);
+		assert.match(appearanceSource, /data-hero-image-file-input="true"/u);
+		assert.match(appearanceSource, /\/api\/admin\/media\/upload-async/u);
+		assert.match(adminScriptSource, /\[data-hero-image-uploader='true'\]/u);
+		assert.match(adminScriptSource, /首屏图片上传成功/u);
+	});
 });

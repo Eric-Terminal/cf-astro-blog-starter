@@ -211,6 +211,7 @@ function renderAppearancePage(options: {
 				place-items: center;
 				padding: 1rem;
 				text-align: center;
+				overflow: hidden;
 				cursor: pointer;
 				transition:
 					border-color var(--transition),
@@ -249,6 +250,17 @@ function renderAppearancePage(options: {
 
 			.appearance-upload-input {
 				display: none;
+			}
+
+			.appearance-hero-uploader {
+				display: grid;
+				gap: 0.65rem;
+				margin-top: 0.75rem;
+			}
+
+			.appearance-hero-dropzone {
+				aspect-ratio: auto;
+				min-height: 170px;
 			}
 
 			.appearance-background-actions {
@@ -512,9 +524,41 @@ function renderAppearancePage(options: {
 							value="${escapeAttribute(settings.heroMainImagePath ?? "")}"
 							maxlength="320"
 							placeholder="/media/appearance/home/hero-main.webp"
+							data-hero-image-path-input="true"
 						/>
+						<div
+							class="appearance-hero-uploader"
+							data-hero-image-uploader="true"
+							data-upload-url="/api/admin/media/upload-async"
+							data-csrf-token="${escapeAttribute(csrfToken)}"
+						>
+							<input
+								type="file"
+								accept="${escapeAttribute(getAllowedMediaAcceptValue())}"
+								class="appearance-upload-input"
+								data-hero-image-file-input="true"
+							/>
+							<div
+								class="appearance-upload-dropzone appearance-hero-dropzone"
+								data-hero-image-dropzone="true"
+								role="button"
+								tabindex="0"
+								aria-label="拖拽文件或点击上传首屏图片"
+							>
+								${
+									settings.heroMainImagePath
+										? `<img src="${escapeAttribute(settings.heroMainImagePath)}" alt="首屏图片预览" class="cover-preview-image" data-hero-image-preview="true" />`
+										: `<div class="cover-empty" data-hero-image-empty="true">拖拽图片或点击上传首屏图片</div>`
+								}
+							</div>
+							<div class="appearance-background-actions">
+								<button type="button" class="btn btn-sm" data-hero-image-select="true">上传首屏图片</button>
+								<button type="button" class="btn btn-sm btn-danger" data-hero-image-clear="true">清空首屏引用</button>
+							</div>
+							<p class="form-help" data-hero-image-status></p>
+						</div>
 					</div>
-					<p class="appearance-note">支持 /media/...、站内绝对路径或 https:// 外链。</p>
+					<p class="appearance-note">支持拖拽上传自动回填，也支持手动输入 /media/...、站内绝对路径或 https:// 外链。</p>
 					<div class="appearance-list-head">
 						<h4>首页按钮</h4>
 						<button type="button" class="btn" data-link-add="hero">+ 新增按钮</button>

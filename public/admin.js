@@ -442,6 +442,149 @@ for (const uploader of document.querySelectorAll("[data-cover-uploader='true']")
 	});
 }
 
+for (const uploader of document.querySelectorAll("[data-hero-image-uploader='true']")) {
+	if (!(uploader instanceof HTMLElement)) {
+		continue;
+	}
+
+	const uploadUrl = uploader.dataset.uploadUrl || "";
+	const csrfToken = uploader.dataset.csrfToken || "";
+	const pathInput =
+		uploader.querySelector("[data-hero-image-path-input='true']") ||
+		uploader.closest(".form-group")?.querySelector("[data-hero-image-path-input='true']") ||
+		document.querySelector("[data-hero-image-path-input='true']");
+	const fileInput = uploader.querySelector("[data-hero-image-file-input='true']");
+	const dropzone = uploader.querySelector("[data-hero-image-dropzone='true']");
+	const status = uploader.querySelector("[data-hero-image-status]");
+	const selectButton = uploader.querySelector("[data-hero-image-select='true']");
+	const clearButton = uploader.querySelector("[data-hero-image-clear='true']");
+
+	const ensurePreviewImage = () => {
+		if (!(dropzone instanceof HTMLElement)) {
+			return null;
+		}
+
+		const existing = dropzone.querySelector("[data-hero-image-preview='true']");
+		if (existing instanceof HTMLImageElement) {
+			return existing;
+		}
+
+		const image = document.createElement("img");
+		image.className = "cover-preview-image";
+		image.setAttribute("data-hero-image-preview", "true");
+		image.alt = "首屏图片预览";
+		dropzone.innerHTML = "";
+		dropzone.appendChild(image);
+		return image;
+	};
+
+	const setEmptyState = () => {
+		if (!(dropzone instanceof HTMLElement)) {
+			return;
+		}
+
+		dropzone.innerHTML =
+			'<div class="cover-empty" data-hero-image-empty="true">拖拽图片或点击上传首屏图片</div>';
+	};
+
+	const setPathValue = (path, previewUrl = path) => {
+		if (pathInput instanceof HTMLInputElement) {
+			pathInput.value = path;
+		}
+
+		if (!path) {
+			setEmptyState();
+			return;
+		}
+
+		const image = ensurePreviewImage();
+		if (image instanceof HTMLImageElement) {
+			image.src = previewUrl;
+		}
+	};
+
+	const uploadFile = async (file) => {
+		if (!file || !uploadUrl || !csrfToken) {
+			return;
+		}
+
+		setStatusMessage(status, "正在上传首屏图片");
+		try {
+			const uploaded = await uploadImageToMedia(file, uploadUrl, csrfToken);
+			setPathValue(uploaded.url, uploaded.url);
+			setStatusMessage(status, "首屏图片上传成功", "success");
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : "首屏图片上传失败，请稍后重试";
+			setStatusMessage(status, message, "error");
+		}
+	};
+
+	selectButton?.addEventListener("click", () => {
+		if (fileInput instanceof HTMLInputElement) {
+			fileInput.click();
+		}
+	});
+
+	fileInput?.addEventListener("change", () => {
+		if (!(fileInput instanceof HTMLInputElement) || !fileInput.files?.[0]) {
+			return;
+		}
+
+		void uploadFile(fileInput.files[0]);
+		fileInput.value = "";
+	});
+
+	clearButton?.addEventListener("click", () => {
+		setPathValue("");
+		setStatusMessage(status, "首屏图片引用已清空", "success");
+	});
+
+	dropzone?.addEventListener("click", () => {
+		if (fileInput instanceof HTMLInputElement) {
+			fileInput.click();
+		}
+	});
+
+	dropzone?.addEventListener("keydown", (event) => {
+		if (event.key !== "Enter" && event.key !== " ") {
+			return;
+		}
+
+		event.preventDefault();
+		if (fileInput instanceof HTMLInputElement) {
+			fileInput.click();
+		}
+	});
+
+	dropzone?.addEventListener("dragover", (event) => {
+		event.preventDefault();
+		if (dropzone instanceof HTMLElement) {
+			dropzone.classList.add("is-dragover");
+		}
+	});
+
+	dropzone?.addEventListener("dragleave", () => {
+		if (dropzone instanceof HTMLElement) {
+			dropzone.classList.remove("is-dragover");
+		}
+	});
+
+	dropzone?.addEventListener("drop", (event) => {
+		event.preventDefault();
+		if (dropzone instanceof HTMLElement) {
+			dropzone.classList.remove("is-dragover");
+		}
+
+		const file = event.dataTransfer?.files?.[0];
+		if (!(file instanceof File)) {
+			return;
+		}
+
+		void uploadFile(file);
+	});
+}
+
 const handleEditorImageUpload = async (file) => {
 	if (!(contentTextarea instanceof HTMLTextAreaElement) || !file) {
 		return;
