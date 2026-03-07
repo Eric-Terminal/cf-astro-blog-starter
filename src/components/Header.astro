@@ -126,7 +126,7 @@ function isLinkActive(href: string) {
 		z-index: 1;
 		width: 100%;
 		max-width: 100vw;
-		margin-inline: auto;
+		margin-inline: 0;
 		border-radius: 0;
 		overflow-x: auto;
 		overflow-y: hidden;
@@ -134,12 +134,11 @@ function isLinkActive(href: string) {
 		scrollbar-width: thin;
 		scrollbar-color: rgba(10, 132, 255, 0.3) transparent;
 		pointer-events: auto;
-		will-change: width, margin-inline, border-radius, max-width, transform;
+		will-change: width, margin-inline, border-radius, transform;
 		transition:
 			width var(--nav-motion-main),
 			margin-inline var(--nav-motion-main),
 			border-radius var(--nav-motion-main),
-			max-width var(--nav-motion-transform),
 			transform var(--nav-motion-transform);
 	}
 
