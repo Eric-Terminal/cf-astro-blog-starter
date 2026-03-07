@@ -33,6 +33,7 @@ describe("评论组件保护喵", () => {
 			/repo:\s*"Eric-Terminal\/cf-astro-blog-starter"/u,
 		);
 		assert.match(typesSource, /repoId:\s*"R_kgDORgHXcA"/u);
-		assert.match(typesSource, /categoryId:\s*""/u);
+		assert.match(typesSource, /category:\s*"Announcements"/u);
+		assert.match(typesSource, /categoryId:\s*"DIC_kwDORgHXcM4C33ay"/u);
 	});
 });
