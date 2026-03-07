@@ -567,6 +567,18 @@ function renderAppearancePage(options: {
 						<label for="heroIntro">简介</label>
 						<textarea id="heroIntro" name="heroIntro" class="form-textarea" maxlength="600">${escapeHtml(settings.heroIntro)}</textarea>
 					</div>
+					<div class="form-group">
+						<label for="heroMainImagePath">首屏图片预留位路径</label>
+						<input
+							id="heroMainImagePath"
+							name="heroMainImagePath"
+							class="form-input appearance-key-input"
+							value="${escapeAttribute(settings.heroMainImagePath ?? "")}"
+							maxlength="320"
+							placeholder="/media/appearance/home/hero-main.webp"
+						/>
+					</div>
+					<p class="appearance-note">支持 /media/...、站内绝对路径或 https:// 外链。</p>
 					<div class="appearance-list-head">
 						<h4>首页按钮</h4>
 						<button type="button" class="btn" data-link-add="hero">+ 新增按钮</button>
@@ -790,6 +802,7 @@ appearance.post("/", async (c) => {
 		heroKicker: getBodyText(body, "heroKicker"),
 		heroTitle: getBodyText(body, "heroTitle"),
 		heroIntro: getBodyText(body, "heroIntro"),
+		heroMainImagePath: getBodyText(body, "heroMainImagePath"),
 		heroActions: buildLinkItemsFromBody(
 			getBodyTexts(body, "heroActionLabel"),
 			getBodyTexts(body, "heroActionHref"),

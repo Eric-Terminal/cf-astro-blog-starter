@@ -57,6 +57,17 @@ describe("站点外观设置喵", () => {
 		assert.equal(normalized.heroSecondaryHref, "/search?tag=astro");
 	});
 
+	test("normalizeSiteAppearanceInput 支持首屏预留图路径喵", () => {
+		const normalized = normalizeSiteAppearanceInput({
+			heroMainImagePath: "appearance/home/main.webp",
+		});
+
+		assert.equal(
+			normalized.heroMainImagePath,
+			"/media/appearance/home/main.webp",
+		);
+	});
+
 	test("buildSiteNavLinks 会按顺序生成顶部导航数据喵", () => {
 		const links = buildSiteNavLinks(DEFAULT_SITE_APPEARANCE);
 

@@ -98,6 +98,7 @@ describe("数据库结构喵", () => {
 		assert.ok(columns.includes("heroKicker"));
 		assert.ok(columns.includes("heroTitle"));
 		assert.ok(columns.includes("heroIntro"));
+		assert.ok(columns.includes("heroMainImagePath"));
 		assert.ok(columns.includes("heroPrimaryLabel"));
 		assert.ok(columns.includes("heroPrimaryHref"));
 		assert.ok(columns.includes("heroSecondaryLabel"));

@@ -68,7 +68,24 @@ function isInternalHref(href: string) {
 			<span class="hero-beam"></span>
 		</div>
 		<div class="home-hero-main">
-			<div class="hero-main-media" aria-hidden="true"></div>
+			<div
+				class:list={[
+					"hero-main-media",
+					{ "hero-main-media-has-image": Boolean(homepageAppearance.heroMainImagePath) },
+				]}
+				aria-hidden={homepageAppearance.heroMainImagePath ? undefined : "true"}
+			>
+				{
+					homepageAppearance.heroMainImagePath ? (
+						<img
+							src={homepageAppearance.heroMainImagePath}
+							alt=""
+							loading="lazy"
+							decoding="async"
+						/>
+					) : null
+				}
+			</div>
 			<div class="home-hero-copy">
 				<span class="section-kicker">{homepageAppearance.heroKicker}</span>
 				<h1 class="page-title">{homepageAppearance.heroTitle}</h1>
@@ -318,7 +335,23 @@ function isInternalHref(href: string) {
 			);
 	}
 
-	.hero-main-media::after {
+	.hero-main-media-has-image::before {
+		background: linear-gradient(
+			180deg,
+			rgba(15, 23, 42, 0.12),
+			rgba(15, 23, 42, 0.24)
+		);
+	}
+
+	.hero-main-media img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transform: scale(1.01);
+	}
+
+	.hero-main-media:not(.hero-main-media-has-image)::after {
 		content: "图片预留位";
 		position: absolute;
 		right: 0.9rem;
