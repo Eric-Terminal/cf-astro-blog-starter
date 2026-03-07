@@ -630,12 +630,6 @@ const appearanceControls = {
 	heroCardBlur: document.querySelector(
 		'[data-appearance-control="heroCardBlur"]',
 	),
-	postCardOpacity: document.querySelector(
-		'[data-appearance-control="postCardOpacity"]',
-	),
-	postCardBlur: document.querySelector(
-		'[data-appearance-control="postCardBlur"]',
-	),
 };
 
 function updateAppearanceDisplay(name, value) {
@@ -646,8 +640,7 @@ function updateAppearanceDisplay(name, value) {
 
 	target.textContent =
 		name === "backgroundBlur" ||
-		name === "heroCardBlur" ||
-		name === "postCardBlur"
+		name === "heroCardBlur"
 			? `${value} px`
 			: `${value}%`;
 }
@@ -673,8 +666,6 @@ function updateAppearancePreview() {
 	const positionY = Number(positionYInput.value);
 	const heroCardOpacityInput = appearanceControls.heroCardOpacity;
 	const heroCardBlurInput = appearanceControls.heroCardBlur;
-	const postCardOpacityInput = appearanceControls.postCardOpacity;
-	const postCardBlurInput = appearanceControls.postCardBlur;
 
 	updateAppearanceDisplay("backgroundScale", scale);
 	updateAppearanceDisplay("backgroundBlur", blur);
@@ -685,12 +676,6 @@ function updateAppearancePreview() {
 	}
 	if (heroCardBlurInput instanceof HTMLInputElement) {
 		updateAppearanceDisplay("heroCardBlur", Number(heroCardBlurInput.value));
-	}
-	if (postCardOpacityInput instanceof HTMLInputElement) {
-		updateAppearanceDisplay("postCardOpacity", Number(postCardOpacityInput.value));
-	}
-	if (postCardBlurInput instanceof HTMLInputElement) {
-		updateAppearanceDisplay("postCardBlur", Number(postCardBlurInput.value));
 	}
 }
 
