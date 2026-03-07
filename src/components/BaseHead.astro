@@ -19,6 +19,7 @@ const {
 const fullTitle =
 	title === siteConfig.name ? title : `${title} · ${siteConfig.name}`;
 const resolvedUrl = canonicalUrl || Astro.url.href;
+const siteLogoUrl = "https://assets.ericterminal.com/logo-transparent.png";
 ---
 
 <meta charset="utf-8" />
@@ -31,7 +32,8 @@ const resolvedUrl = canonicalUrl || Astro.url.href;
 <meta name="description" content={description} />
 <link rel="canonical" href={resolvedUrl} />
 
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" href={siteLogoUrl} />
+<link rel="apple-touch-icon" href={siteLogoUrl} />
 <link rel="sitemap" href="/sitemap.xml" />
 
 <!-- Open Graph -->
