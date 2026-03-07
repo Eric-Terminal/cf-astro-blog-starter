@@ -45,8 +45,10 @@ describe("后台界面风格保护", () => {
 		assert.match(source, /heroIntro/u);
 		assert.match(source, /heroMainImagePath/u);
 		assert.match(source, /heroSignalHeading/u);
-		assert.match(source, /heroTopicText/u);
-		assert.match(source, /heroWritingText/u);
+		assert.match(source, /heroSignalImagePath/u);
+		assert.match(source, /heroSignalChip1/u);
+		assert.match(source, /heroSignalChip2/u);
+		assert.match(source, /heroSignalChip3/u);
 	});
 
 	test("文章封面上传会回填隐藏字段用于持久化保存", async () => {
@@ -103,6 +105,20 @@ describe("后台界面风格保护", () => {
 		assert.match(appearanceSource, /\/api\/admin\/media\/upload-async/u);
 		assert.match(adminScriptSource, /\[data-hero-image-uploader='true'\]/u);
 		assert.match(adminScriptSource, /首屏图片上传成功/u);
+	});
+
+	test("外观页右侧卡片图片支持拖拽上传并自动回填路径", async () => {
+		const [appearanceSource, adminScriptSource] = await Promise.all([
+			readFile("src/admin/routes/appearance.ts", "utf8"),
+			readFile("public/admin.js", "utf8"),
+		]);
+
+		assert.match(appearanceSource, /data-signal-image-uploader="true"/u);
+		assert.match(appearanceSource, /data-signal-image-dropzone="true"/u);
+		assert.match(appearanceSource, /data-signal-image-path-input="true"/u);
+		assert.match(appearanceSource, /data-signal-image-file-input="true"/u);
+		assert.match(adminScriptSource, /\[data-signal-image-uploader='true'\]/u);
+		assert.match(adminScriptSource, /右侧卡片图片上传成功/u);
 	});
 
 	test("媒体文件读取与删除使用通配参数提取键名，避免 /api 前缀重写误删", async () => {

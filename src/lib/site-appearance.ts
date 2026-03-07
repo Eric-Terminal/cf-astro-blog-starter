@@ -51,8 +51,10 @@ export interface SiteAppearance {
 	heroSignalLabel: string;
 	heroSignalHeading: string;
 	heroSignalCopy: string;
-	heroTopicText: string;
-	heroWritingText: string;
+	heroSignalImagePath: string | null;
+	heroSignalChip1: string;
+	heroSignalChip2: string;
+	heroSignalChip3: string;
 }
 
 export type SiteAppearanceInput = Partial<SiteAppearance> & {
@@ -92,8 +94,10 @@ export const DEFAULT_SITE_APPEARANCE: SiteAppearance = {
 	heroSignalHeading: "首页会跟着你的视线轻轻转一下",
 	heroSignalCopy:
 		"不是把页面做得很吵，而是只让首屏层次、信息胶囊和按钮反馈更有呼吸感。",
-	heroTopicText: "Cloudflare · 前端工程 · 架构细节",
-	heroWritingText: "慢一点，但尽量长期有效。",
+	heroSignalImagePath: null,
+	heroSignalChip1: "Mouse Sync",
+	heroSignalChip2: "Soft Orbit",
+	heroSignalChip3: "Card Lift",
 };
 
 function clampInteger(
@@ -409,15 +413,23 @@ export function normalizeSiteAppearanceInput(
 			300,
 			DEFAULT_SITE_APPEARANCE.heroSignalCopy,
 		),
-		heroTopicText: normalizeText(
-			input.heroTopicText,
-			120,
-			DEFAULT_SITE_APPEARANCE.heroTopicText,
+		heroSignalImagePath:
+			normalizeOptionalImagePath(input.heroSignalImagePath) ??
+			DEFAULT_SITE_APPEARANCE.heroSignalImagePath,
+		heroSignalChip1: normalizeText(
+			input.heroSignalChip1,
+			24,
+			DEFAULT_SITE_APPEARANCE.heroSignalChip1,
 		),
-		heroWritingText: normalizeText(
-			input.heroWritingText,
-			120,
-			DEFAULT_SITE_APPEARANCE.heroWritingText,
+		heroSignalChip2: normalizeText(
+			input.heroSignalChip2,
+			24,
+			DEFAULT_SITE_APPEARANCE.heroSignalChip2,
+		),
+		heroSignalChip3: normalizeText(
+			input.heroSignalChip3,
+			24,
+			DEFAULT_SITE_APPEARANCE.heroSignalChip3,
 		),
 	};
 }
@@ -466,8 +478,10 @@ export async function getSiteAppearance(db: Database): Promise<SiteAppearance> {
 			heroSignalLabel: siteAppearanceSettings.heroSignalLabel,
 			heroSignalHeading: siteAppearanceSettings.heroSignalHeading,
 			heroSignalCopy: siteAppearanceSettings.heroSignalCopy,
-			heroTopicText: siteAppearanceSettings.heroTopicText,
-			heroWritingText: siteAppearanceSettings.heroWritingText,
+			heroSignalImagePath: siteAppearanceSettings.heroSignalImagePath,
+			heroSignalChip1: siteAppearanceSettings.heroSignalChip1,
+			heroSignalChip2: siteAppearanceSettings.heroSignalChip2,
+			heroSignalChip3: siteAppearanceSettings.heroSignalChip3,
 		})
 		.from(siteAppearanceSettings)
 		.where(eq(siteAppearanceSettings.id, 1))
@@ -521,8 +535,10 @@ export async function saveSiteAppearance(
 			heroSignalLabel: normalized.heroSignalLabel,
 			heroSignalHeading: normalized.heroSignalHeading,
 			heroSignalCopy: normalized.heroSignalCopy,
-			heroTopicText: normalized.heroTopicText,
-			heroWritingText: normalized.heroWritingText,
+			heroSignalImagePath: normalized.heroSignalImagePath,
+			heroSignalChip1: normalized.heroSignalChip1,
+			heroSignalChip2: normalized.heroSignalChip2,
+			heroSignalChip3: normalized.heroSignalChip3,
 		})
 		.onConflictDoUpdate({
 			target: siteAppearanceSettings.id,
@@ -556,8 +572,10 @@ export async function saveSiteAppearance(
 				heroSignalLabel: normalized.heroSignalLabel,
 				heroSignalHeading: normalized.heroSignalHeading,
 				heroSignalCopy: normalized.heroSignalCopy,
-				heroTopicText: normalized.heroTopicText,
-				heroWritingText: normalized.heroWritingText,
+				heroSignalImagePath: normalized.heroSignalImagePath,
+				heroSignalChip1: normalized.heroSignalChip1,
+				heroSignalChip2: normalized.heroSignalChip2,
+				heroSignalChip3: normalized.heroSignalChip3,
 			},
 		});
 

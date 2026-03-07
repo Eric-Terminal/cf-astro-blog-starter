@@ -128,7 +128,9 @@ describe("数据库结构", () => {
 		assert.ok(columns.includes("heroSignalLabel"));
 		assert.ok(columns.includes("heroSignalHeading"));
 		assert.ok(columns.includes("heroSignalCopy"));
-		assert.ok(columns.includes("heroTopicText"));
-		assert.ok(columns.includes("heroWritingText"));
+		assert.ok(columns.includes("heroSignalImagePath"));
+		assert.ok(columns.includes("heroSignalChip1"));
+		assert.ok(columns.includes("heroSignalChip2"));
+		assert.ok(columns.includes("heroSignalChip3"));
 	});
 });

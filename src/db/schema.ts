@@ -147,12 +147,10 @@ export const siteAppearanceSettings = sqliteTable("site_appearance_settings", {
 		.default(
 			"不是把页面做得很吵，而是只让首屏层次、信息胶囊和按钮反馈更有呼吸感。",
 		),
-	heroTopicText: text("hero_topic_text")
-		.notNull()
-		.default("Cloudflare · 前端工程 · 架构细节"),
-	heroWritingText: text("hero_writing_text")
-		.notNull()
-		.default("慢一点，但尽量长期有效。"),
+	heroSignalImagePath: text("hero_signal_image_path"),
+	heroSignalChip1: text("hero_signal_chip_1").notNull().default("Mouse Sync"),
+	heroSignalChip2: text("hero_signal_chip_2").notNull().default("Soft Orbit"),
+	heroSignalChip3: text("hero_signal_chip_3").notNull().default("Card Lift"),
 	updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
 });
 

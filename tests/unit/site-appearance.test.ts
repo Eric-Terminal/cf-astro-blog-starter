@@ -87,6 +87,23 @@ describe("站点外观设置", () => {
 		);
 	});
 
+	test("normalizeSiteAppearanceInput 支持右侧信息卡图片与标签", () => {
+		const normalized = normalizeSiteAppearanceInput({
+			heroSignalImagePath: "appearance/home/signal.webp",
+			heroSignalChip1: "指针联动",
+			heroSignalChip2: "柔和轨道",
+			heroSignalChip3: "卡片抬升",
+		});
+
+		assert.equal(
+			normalized.heroSignalImagePath,
+			"/media/appearance/home/signal.webp",
+		);
+		assert.equal(normalized.heroSignalChip1, "指针联动");
+		assert.equal(normalized.heroSignalChip2, "柔和轨道");
+		assert.equal(normalized.heroSignalChip3, "卡片抬升");
+	});
+
 	test("buildSiteNavLinks 会按顺序生成顶部导航数据", () => {
 		const links = buildSiteNavLinks(DEFAULT_SITE_APPEARANCE);
 
