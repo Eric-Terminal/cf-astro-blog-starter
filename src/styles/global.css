@@ -445,14 +445,22 @@ pre code {
 	justify-content: center;
 	gap: var(--space-xs);
 	padding: 0.9rem 1.3rem;
+	border: none;
 	border-radius: var(--radius-pill);
+	appearance: none;
 	background: #0a84ff;
 	color: #f8fbff;
+	cursor: pointer;
 	box-shadow: 0 14px 32px -24px rgba(10, 132, 255, 0.45);
 	transition:
 		transform var(--transition),
 		box-shadow var(--transition),
 		opacity var(--transition);
+}
+
+.button:focus-visible {
+	outline: 2px solid rgba(10, 132, 255, 0.46);
+	outline-offset: 2px;
 }
 
 .button:hover {
