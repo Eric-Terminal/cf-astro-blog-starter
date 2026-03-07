@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { describe, test } from "node:test";
 import { adminLayout } from "../../src/admin/views/layout";
 import { loginPage } from "../../src/admin/views/login";
@@ -28,5 +29,18 @@ describe("后台界面风格保护喵", () => {
 		assert.match(html, /主页同款后台/u);
 		assert.match(html, /GitHub OAuth/u);
 		assert.match(html, /\/api\/auth\/github/u);
+	});
+
+	test("外观页提供顶部状态栏与首页文案编辑入口喵", async () => {
+		const source = await readFile("src/admin/routes/appearance.ts", "utf8");
+
+		assert.match(source, /headerSubtitle/u);
+		assert.match(source, /navLink1Label/u);
+		assert.match(source, /navLink1Href/u);
+		assert.match(source, /heroTitle/u);
+		assert.match(source, /heroIntro/u);
+		assert.match(source, /heroSignalHeading/u);
+		assert.match(source, /heroTopicText/u);
+		assert.match(source, /heroWritingText/u);
 	});
 });

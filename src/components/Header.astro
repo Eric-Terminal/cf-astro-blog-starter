@@ -1,8 +1,31 @@
 ---
+import { buildSiteNavLinks, type SiteAppearance } from "@/lib/site-appearance";
 import { siteConfig } from "@/lib/types";
 import ThemeToggle from "./ThemeToggle.astro";
 
+interface Props {
+	siteAppearance: SiteAppearance;
+}
+
 const currentPath = Astro.url.pathname;
+const { siteAppearance }: Props = Astro.props;
+const navLinks = buildSiteNavLinks(siteAppearance);
+
+function isInternalHref(href: string) {
+	return href.startsWith("/") && !href.startsWith("//");
+}
+
+function isLinkActive(href: string) {
+	if (!isInternalHref(href)) {
+		return false;
+	}
+
+	if (href === "/") {
+		return currentPath === "/";
+	}
+
+	return currentPath === href || currentPath.startsWith(`${href}/`);
+}
 ---
 
 <header class="site-header">
@@ -12,19 +35,24 @@ const currentPath = Astro.url.pathname;
 				<span class="site-brand-mark">E</span>
 				<span class="site-brand-copy">
 					<strong>{siteConfig.name}</strong>
-					<small>流畅、克制、持续更新的技术写作</small>
+					<small>{siteAppearance.headerSubtitle}</small>
 				</span>
 			</a>
 			<ul class="nav-links">
-				<li>
-					<a href="/" class:list={["nav-link", { active: currentPath === "/" }]}>首页</a>
-				</li>
-				<li>
-					<a href="/blog" class:list={["nav-link", { active: currentPath.startsWith("/blog") }]}>归档</a>
-				</li>
-				<li>
-					<a href="/search" class:list={["nav-link", { active: currentPath === "/search" }]}>搜索</a>
-				</li>
+				{
+					navLinks.map((item) => (
+						<li>
+							<a
+								href={item.href}
+								class:list={["nav-link", { active: isLinkActive(item.href) }]}
+								target={isInternalHref(item.href) ? undefined : "_blank"}
+								rel={isInternalHref(item.href) ? undefined : "noopener noreferrer"}
+							>
+								{item.label}
+							</a>
+						</li>
+					))
+				}
 			</ul>
 			<div class="nav-actions">
 				<ThemeToggle />

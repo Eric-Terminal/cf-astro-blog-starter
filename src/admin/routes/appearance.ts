@@ -23,6 +23,11 @@ import { adminLayout } from "../views/layout";
 
 const appearance = new Hono<AdminAppEnv>();
 
+function getBodyText(body: Record<string, string | File>, key: string): string {
+	const value = body[key];
+	return typeof value === "string" ? value : "";
+}
+
 function renderAppearancePage(options: {
 	csrfToken: string;
 	settings: typeof DEFAULT_SITE_APPEARANCE;
@@ -163,6 +168,22 @@ function renderAppearancePage(options: {
 				gap: 1rem;
 			}
 
+			.appearance-inline-grid {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 0.85rem;
+			}
+
+			.appearance-content-fieldset {
+				margin-top: 1.25rem;
+				border-top: 1px solid var(--border);
+				padding-top: 1.25rem;
+			}
+
+			.appearance-content-fieldset h3 {
+				margin-bottom: 0.8rem;
+			}
+
 			.appearance-range {
 				display: grid;
 				gap: 0.5rem;
@@ -192,6 +213,10 @@ function renderAppearancePage(options: {
 				font-size: 0.82rem;
 			}
 
+			.appearance-panel .form-textarea {
+				min-height: 120px;
+			}
+
 			@media (max-width: 980px) {
 				.appearance-grid {
 					grid-template-columns: 1fr;
@@ -200,13 +225,17 @@ function renderAppearancePage(options: {
 				.appearance-stage {
 					min-height: 280px;
 				}
+
+				.appearance-inline-grid {
+					grid-template-columns: 1fr;
+				}
 			}
 		</style>
 		${alertHtml}
 		<div class="appearance-grid">
 			<div>
 				<h1>站点外观</h1>
-				<p class="appearance-copy">这里专门控制前台全站背景图。先上传图片，再通过缩放、模糊和焦点位置来调裁切效果。</p>
+				<p class="appearance-copy">这里统一控制前台背景、顶部状态栏、导航索引链接和首页首屏文案。</p>
 				<div class="appearance-panel">
 					<h2>背景图上传</h2>
 					<div class="appearance-stack">
@@ -229,6 +258,199 @@ function renderAppearancePage(options: {
 							value="${escapeAttribute(settings.backgroundImageKey ?? "")}"
 							placeholder="appearance/background/2026-03-07/xxxx.webp"
 						/>
+					</div>
+					<div class="appearance-content-fieldset">
+						<h3>顶部状态栏与导航索引</h3>
+						<div class="form-group">
+							<label for="headerSubtitle">顶部状态栏文案</label>
+							<input
+								id="headerSubtitle"
+								name="headerSubtitle"
+								class="form-input"
+								value="${escapeAttribute(settings.headerSubtitle)}"
+								maxlength="120"
+							/>
+						</div>
+						<div class="appearance-inline-grid">
+							<div class="form-group">
+								<label for="navLink1Label">导航 1 文案</label>
+								<input
+									id="navLink1Label"
+									name="navLink1Label"
+									class="form-input"
+									value="${escapeAttribute(settings.navLink1Label)}"
+									maxlength="24"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="navLink1Href">导航 1 链接</label>
+								<input
+									id="navLink1Href"
+									name="navLink1Href"
+									class="form-input"
+									value="${escapeAttribute(settings.navLink1Href)}"
+									maxlength="240"
+									placeholder="/"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="navLink2Label">导航 2 文案</label>
+								<input
+									id="navLink2Label"
+									name="navLink2Label"
+									class="form-input"
+									value="${escapeAttribute(settings.navLink2Label)}"
+									maxlength="24"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="navLink2Href">导航 2 链接</label>
+								<input
+									id="navLink2Href"
+									name="navLink2Href"
+									class="form-input"
+									value="${escapeAttribute(settings.navLink2Href)}"
+									maxlength="240"
+									placeholder="/blog"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="navLink3Label">导航 3 文案</label>
+								<input
+									id="navLink3Label"
+									name="navLink3Label"
+									class="form-input"
+									value="${escapeAttribute(settings.navLink3Label)}"
+									maxlength="24"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="navLink3Href">导航 3 链接</label>
+								<input
+									id="navLink3Href"
+									name="navLink3Href"
+									class="form-input"
+									value="${escapeAttribute(settings.navLink3Href)}"
+									maxlength="240"
+									placeholder="/search"
+								/>
+							</div>
+						</div>
+					</div>
+					<div class="appearance-content-fieldset">
+						<h3>首页首屏文案</h3>
+						<div class="form-group">
+							<label for="heroKicker">顶部标签</label>
+							<input
+								id="heroKicker"
+								name="heroKicker"
+								class="form-input"
+								value="${escapeAttribute(settings.heroKicker)}"
+								maxlength="24"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="heroTitle">主标题</label>
+							<input
+								id="heroTitle"
+								name="heroTitle"
+								class="form-input"
+								value="${escapeAttribute(settings.heroTitle)}"
+								maxlength="120"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="heroIntro">简介</label>
+							<textarea id="heroIntro" name="heroIntro" class="form-textarea" maxlength="600">${escapeHtml(settings.heroIntro)}</textarea>
+						</div>
+						<div class="appearance-inline-grid">
+							<div class="form-group">
+								<label for="heroPrimaryLabel">主按钮文案</label>
+								<input
+									id="heroPrimaryLabel"
+									name="heroPrimaryLabel"
+									class="form-input"
+									value="${escapeAttribute(settings.heroPrimaryLabel)}"
+									maxlength="24"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="heroPrimaryHref">主按钮链接</label>
+								<input
+									id="heroPrimaryHref"
+									name="heroPrimaryHref"
+									class="form-input"
+									value="${escapeAttribute(settings.heroPrimaryHref)}"
+									maxlength="240"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="heroSecondaryLabel">次按钮文案</label>
+								<input
+									id="heroSecondaryLabel"
+									name="heroSecondaryLabel"
+									class="form-input"
+									value="${escapeAttribute(settings.heroSecondaryLabel)}"
+									maxlength="24"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="heroSecondaryHref">次按钮链接</label>
+								<input
+									id="heroSecondaryHref"
+									name="heroSecondaryHref"
+									class="form-input"
+									value="${escapeAttribute(settings.heroSecondaryHref)}"
+									maxlength="240"
+								/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="heroSignalLabel">右侧卡片标签</label>
+							<input
+								id="heroSignalLabel"
+								name="heroSignalLabel"
+								class="form-input"
+								value="${escapeAttribute(settings.heroSignalLabel)}"
+								maxlength="30"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="heroSignalHeading">右侧卡片标题</label>
+							<input
+								id="heroSignalHeading"
+								name="heroSignalHeading"
+								class="form-input"
+								value="${escapeAttribute(settings.heroSignalHeading)}"
+								maxlength="120"
+							/>
+						</div>
+						<div class="form-group">
+							<label for="heroSignalCopy">右侧卡片描述</label>
+							<textarea id="heroSignalCopy" name="heroSignalCopy" class="form-textarea" maxlength="300">${escapeHtml(settings.heroSignalCopy)}</textarea>
+						</div>
+						<div class="appearance-inline-grid">
+							<div class="form-group">
+								<label for="heroTopicText">关注主题</label>
+								<input
+									id="heroTopicText"
+									name="heroTopicText"
+									class="form-input"
+									value="${escapeAttribute(settings.heroTopicText)}"
+									maxlength="120"
+								/>
+							</div>
+							<div class="form-group">
+								<label for="heroWritingText">写作方式</label>
+								<input
+									id="heroWritingText"
+									name="heroWritingText"
+									class="form-input"
+									value="${escapeAttribute(settings.heroWritingText)}"
+									maxlength="120"
+								/>
+							</div>
+						</div>
 					</div>
 					<div class="appearance-controls">
 						<div class="appearance-range">
@@ -349,12 +571,12 @@ appearance.get("/", async (c) => {
 
 appearance.post("/", async (c) => {
 	const session = getAuthenticatedSession(c);
-	const body = await c.req.parseBody();
+	const body = (await c.req.parseBody()) as Record<string, string | File>;
 	if (!assertCsrfToken(body._csrf, session)) {
 		return c.text("CSRF 校验失败喵", 403);
 	}
 
-	const backgroundImageKey = String(body.backgroundImageKey ?? "").trim();
+	const backgroundImageKey = getBodyText(body, "backgroundImageKey").trim();
 	if (backgroundImageKey && !sanitizeMediaKey(backgroundImageKey)) {
 		return c.html(
 			renderAppearanceErrorPage(session.csrfToken, "背景图键名格式不合法喵"),
@@ -368,6 +590,25 @@ appearance.post("/", async (c) => {
 		backgroundScale: Number(body.backgroundScale ?? Number.NaN),
 		backgroundPositionX: Number(body.backgroundPositionX ?? Number.NaN),
 		backgroundPositionY: Number(body.backgroundPositionY ?? Number.NaN),
+		headerSubtitle: getBodyText(body, "headerSubtitle"),
+		navLink1Label: getBodyText(body, "navLink1Label"),
+		navLink1Href: getBodyText(body, "navLink1Href"),
+		navLink2Label: getBodyText(body, "navLink2Label"),
+		navLink2Href: getBodyText(body, "navLink2Href"),
+		navLink3Label: getBodyText(body, "navLink3Label"),
+		navLink3Href: getBodyText(body, "navLink3Href"),
+		heroKicker: getBodyText(body, "heroKicker"),
+		heroTitle: getBodyText(body, "heroTitle"),
+		heroIntro: getBodyText(body, "heroIntro"),
+		heroPrimaryLabel: getBodyText(body, "heroPrimaryLabel"),
+		heroPrimaryHref: getBodyText(body, "heroPrimaryHref"),
+		heroSecondaryLabel: getBodyText(body, "heroSecondaryLabel"),
+		heroSecondaryHref: getBodyText(body, "heroSecondaryHref"),
+		heroSignalLabel: getBodyText(body, "heroSignalLabel"),
+		heroSignalHeading: getBodyText(body, "heroSignalHeading"),
+		heroSignalCopy: getBodyText(body, "heroSignalCopy"),
+		heroTopicText: getBodyText(body, "heroTopicText"),
+		heroWritingText: getBodyText(body, "heroWritingText"),
 	});
 
 	return c.redirect("/api/admin/appearance?status=saved");

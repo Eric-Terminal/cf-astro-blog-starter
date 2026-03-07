@@ -6,6 +6,10 @@ import Base from "@/layouts/Base.astro";
 import { getDb } from "@/lib/db";
 import { formatDate } from "@/lib/format";
 import { getPublicPostVisibilityCondition } from "@/lib/public-content";
+import {
+	DEFAULT_SITE_APPEARANCE,
+	getSiteAppearance,
+} from "@/lib/site-appearance";
 import { siteConfig } from "@/lib/types";
 
 let recentPosts: Array<{
@@ -18,10 +22,12 @@ let recentPosts: Array<{
 	featuredImageKey: string | null;
 	featuredImageAlt: string | null;
 }> = [];
+let homepageAppearance = DEFAULT_SITE_APPEARANCE;
 
 try {
 	const { env } = Astro.locals.runtime;
 	const db = getDb(env.DB);
+	homepageAppearance = await getSiteAppearance(db);
 	recentPosts = await db
 		.select({
 			title: blogPosts.title,
@@ -45,6 +51,10 @@ try {
 const latestUpdate = recentPosts[0]?.publishedAt
 	? formatDate(recentPosts[0].publishedAt)
 	: "等待第一篇正式发布的文章";
+
+function isInternalHref(href: string) {
+	return href.startsWith("/") && !href.startsWith("//");
+}
 ---
 
 <Base title={siteConfig.name} description={siteConfig.description}>
@@ -56,27 +66,44 @@ const latestUpdate = recentPosts[0]?.publishedAt
 			<span class="hero-beam"></span>
 		</div>
 		<div class="home-hero-main">
-			<span class="section-kicker">云端记录</span>
-			<h1 class="page-title">把工程判断写清楚，把技术细节写漂亮。</h1>
-			<p class="page-intro">
-				这里记录 Cloudflare、前端工程、调试过程和系统设计里那些值得反复回看的瞬间。
-				界面会继续打磨，但内容先要足够清晰、足够耐读。
-			</p>
+			<span class="section-kicker">{homepageAppearance.heroKicker}</span>
+			<h1 class="page-title">{homepageAppearance.heroTitle}</h1>
+			<p class="page-intro">{homepageAppearance.heroIntro}</p>
 			<div class="hero-actions">
-				<a href="/blog" class="button">进入归档</a>
+				<a
+					href={homepageAppearance.heroPrimaryHref}
+					class="button"
+					target={isInternalHref(homepageAppearance.heroPrimaryHref)
+						? undefined
+						: "_blank"}
+					rel={isInternalHref(homepageAppearance.heroPrimaryHref)
+						? undefined
+						: "noopener noreferrer"}
+				>
+					{homepageAppearance.heroPrimaryLabel}
+				</a>
 				<span class="hero-search-bridge" transition:name="search-entry">
-					<a href="/search" class="button button-secondary">站内搜索</a>
+					<a
+						href={homepageAppearance.heroSecondaryHref}
+						class="button button-secondary"
+						target={isInternalHref(homepageAppearance.heroSecondaryHref)
+							? undefined
+							: "_blank"}
+						rel={isInternalHref(homepageAppearance.heroSecondaryHref)
+							? undefined
+							: "noopener noreferrer"}
+					>
+						{homepageAppearance.heroSecondaryLabel}
+					</a>
 				</span>
 			</div>
 		</div>
 		<div class="home-hero-side">
 			<article class="hero-signal-card" data-tilt-card>
 				<div class="hero-signal-glow" aria-hidden="true"></div>
-				<span class="hero-signal-label">Scene Depth</span>
-				<strong class="hero-signal-heading">首页会跟着你的视线轻轻转一下</strong>
-				<p class="hero-signal-copy">
-					不是把页面做得很吵，而是只让首屏层次、信息胶囊和按钮反馈更有呼吸感。
-				</p>
+				<span class="hero-signal-label">{homepageAppearance.heroSignalLabel}</span>
+				<strong class="hero-signal-heading">{homepageAppearance.heroSignalHeading}</strong>
+				<p class="hero-signal-copy">{homepageAppearance.heroSignalCopy}</p>
 				<div class="hero-signal-row">
 					<span class="hero-signal-chip">Mouse Sync</span>
 					<span class="hero-signal-chip">Soft Orbit</span>
@@ -94,11 +121,11 @@ const latestUpdate = recentPosts[0]?.publishedAt
 			</div>
 			<div class="hero-metric">
 				<span>关注主题</span>
-				<strong>Cloudflare · 前端工程 · 架构细节</strong>
+				<strong>{homepageAppearance.heroTopicText}</strong>
 			</div>
 			<div class="hero-metric">
 				<span>写作方式</span>
-				<strong>慢一点，但尽量长期有效。</strong>
+				<strong>{homepageAppearance.heroWritingText}</strong>
 			</div>
 		</div>
 	</section>

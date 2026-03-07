@@ -86,6 +86,45 @@ export const siteAppearanceSettings = sqliteTable("site_appearance_settings", {
 	backgroundScale: integer("background_scale").notNull().default(112),
 	backgroundPositionX: integer("background_position_x").notNull().default(50),
 	backgroundPositionY: integer("background_position_y").notNull().default(50),
+	headerSubtitle: text("header_subtitle")
+		.notNull()
+		.default("流畅、克制、持续更新的技术写作"),
+	navLink1Label: text("nav_link_1_label").notNull().default("首页"),
+	navLink1Href: text("nav_link_1_href").notNull().default("/"),
+	navLink2Label: text("nav_link_2_label").notNull().default("归档"),
+	navLink2Href: text("nav_link_2_href").notNull().default("/blog"),
+	navLink3Label: text("nav_link_3_label").notNull().default("搜索"),
+	navLink3Href: text("nav_link_3_href").notNull().default("/search"),
+	heroKicker: text("hero_kicker").notNull().default("云端记录"),
+	heroTitle: text("hero_title")
+		.notNull()
+		.default("把工程判断写清楚，把技术细节写漂亮。"),
+	heroIntro: text("hero_intro")
+		.notNull()
+		.default(
+			"这里记录 Cloudflare、前端工程、调试过程和系统设计里那些值得反复回看的瞬间。界面会继续打磨，但内容先要足够清晰、足够耐读。",
+		),
+	heroPrimaryLabel: text("hero_primary_label").notNull().default("进入归档"),
+	heroPrimaryHref: text("hero_primary_href").notNull().default("/blog"),
+	heroSecondaryLabel: text("hero_secondary_label")
+		.notNull()
+		.default("站内搜索"),
+	heroSecondaryHref: text("hero_secondary_href").notNull().default("/search"),
+	heroSignalLabel: text("hero_signal_label").notNull().default("Scene Depth"),
+	heroSignalHeading: text("hero_signal_heading")
+		.notNull()
+		.default("首页会跟着你的视线轻轻转一下"),
+	heroSignalCopy: text("hero_signal_copy")
+		.notNull()
+		.default(
+			"不是把页面做得很吵，而是只让首屏层次、信息胶囊和按钮反馈更有呼吸感。",
+		),
+	heroTopicText: text("hero_topic_text")
+		.notNull()
+		.default("Cloudflare · 前端工程 · 架构细节"),
+	heroWritingText: text("hero_writing_text")
+		.notNull()
+		.default("慢一点，但尽量长期有效。"),
 	updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
 });
 
