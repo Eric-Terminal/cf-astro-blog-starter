@@ -1,11 +1,13 @@
 import { Hono } from "hono";
 import {
-	buildMediaObjectKey,
+	deleteMediaObjectAndIndex,
 	getAllowedMediaAcceptValue,
 	getMediaContentTypeForKey,
 	isAllowedImageMimeType,
 	isImageMediaKey,
+	isMediaHashIndexKey,
 	MAX_UPLOAD_BYTES,
+	saveMediaObjectWithDedup,
 } from "@/lib/media";
 import {
 	buildProtectedAssetHeaders,
@@ -52,11 +54,39 @@ function validateUploadFile(file: File): string | null {
 }
 
 async function saveUploadFile(c: { env: AdminAppEnv["Bindings"] }, file: File) {
-	const key = buildMediaObjectKey(file);
-	await c.env.MEDIA_BUCKET.put(key, await file.arrayBuffer(), {
-		httpMetadata: { contentType: getMediaContentTypeForKey(key) || file.type },
+	return saveMediaObjectWithDedup({
+		bucket: c.env.MEDIA_BUCKET,
+		file,
+		prefix: "uploads",
 	});
-	return key;
+}
+
+async function listVisibleMediaObjects(
+	bucket: AdminAppEnv["Bindings"]["MEDIA_BUCKET"],
+	limit: number,
+) {
+	const visibleObjects: R2Object[] = [];
+	let cursor: string | undefined;
+
+	while (visibleObjects.length < limit) {
+		const listed = await bucket.list({ cursor, limit: 1000 });
+		for (const object of listed.objects) {
+			if (!isMediaHashIndexKey(object.key)) {
+				visibleObjects.push(object);
+			}
+
+			if (visibleObjects.length >= limit) {
+				break;
+			}
+		}
+
+		if (!listed.truncated) {
+			break;
+		}
+		cursor = listed.cursor;
+	}
+
+	return visibleObjects;
 }
 
 media.use("*", requireAuth);
@@ -66,8 +96,7 @@ media.get("/", async (c) => {
 	let objects: R2Object[] = [];
 
 	try {
-		const listed = await c.env.MEDIA_BUCKET.list({ limit: 100 });
-		objects = listed.objects;
+		objects = await listVisibleMediaObjects(c.env.MEDIA_BUCKET, 100);
 	} catch {
 		// R2 未绑定时回退为空列表
 	}
@@ -187,11 +216,14 @@ media.post("/upload-async", async (c) => {
 	}
 
 	try {
-		const key = await saveUploadFile(c, file);
+		const uploaded = await saveUploadFile(c, file);
 		return c.json({
-			key,
-			url: `/media/${key}`,
-			message: "上传成功",
+			key: uploaded.key,
+			url: `/media/${uploaded.key}`,
+			deduplicated: uploaded.deduplicated,
+			message: uploaded.deduplicated
+				? "检测到重复内容，已复用已有媒体文件"
+				: "上传成功",
 		});
 	} catch {
 		return c.json({ message: "上传失败，请稍后再试" }, 500);
@@ -237,8 +269,11 @@ media.post("/delete/*", async (c) => {
 	if (!key) {
 		return c.text("媒体键名不合法", 400);
 	}
+	if (isMediaHashIndexKey(key)) {
+		return c.text("不允许删除内部索引对象", 400);
+	}
 
-	await c.env.MEDIA_BUCKET.delete(key);
+	await deleteMediaObjectAndIndex(c.env.MEDIA_BUCKET, key);
 	return c.redirect("/api/admin/media");
 });
 

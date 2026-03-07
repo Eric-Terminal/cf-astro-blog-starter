@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { getDb } from "@/lib/db";
 import {
-	buildMediaObjectKey,
 	getAllowedMediaAcceptValue,
 	isAllowedImageMimeType,
 	MAX_UPLOAD_BYTES,
+	saveMediaObjectWithDedup,
 } from "@/lib/media";
 import { escapeAttribute, escapeHtml, sanitizeMediaKey } from "@/lib/security";
 import {
@@ -840,9 +840,10 @@ appearance.post("/background/upload", async (c) => {
 		);
 	}
 
-	const key = buildMediaObjectKey(file, "appearance/background");
-	await c.env.MEDIA_BUCKET.put(key, await file.arrayBuffer(), {
-		httpMetadata: { contentType: file.type },
+	const uploaded = await saveMediaObjectWithDedup({
+		bucket: c.env.MEDIA_BUCKET,
+		file,
+		prefix: "appearance/background",
 	});
 
 	const currentSettings = await getSiteAppearance(getDb(c.env.DB)).catch(
@@ -850,7 +851,7 @@ appearance.post("/background/upload", async (c) => {
 	);
 	await saveSiteAppearance(getDb(c.env.DB), {
 		...currentSettings,
-		backgroundImageKey: key,
+		backgroundImageKey: uploaded.key,
 	});
 
 	return c.redirect("/api/admin/appearance?status=uploaded");
