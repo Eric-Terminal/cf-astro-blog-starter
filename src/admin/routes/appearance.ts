@@ -196,6 +196,13 @@ function renderAppearancePage(options: {
 				min-width: 220px;
 			}
 
+			.appearance-background-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.75rem;
+				margin-top: 0.85rem;
+			}
+
 			.appearance-stage {
 				position: relative;
 				min-height: 360px;
@@ -400,32 +407,24 @@ function renderAppearancePage(options: {
 		${alertHtml}
 		<h1>站点外观</h1>
 		<p class="appearance-copy">这里统一控制前台背景、顶部状态栏、导航索引链接和首页首屏文案。</p>
-		<div class="appearance-panel">
-			<h2>背景图上传</h2>
-			<div class="appearance-stack">
-				<form method="post" action="/api/admin/appearance/background/upload" enctype="multipart/form-data" class="appearance-upload-form">
-					<input type="hidden" name="_csrf" value="${escapeAttribute(csrfToken)}" />
-					<input type="file" name="file" accept="${escapeAttribute(getAllowedMediaAcceptValue())}" required data-appearance-upload-input />
-					<button type="submit" class="btn btn-primary">上传并设为当前背景</button>
-				</form>
-				<p class="appearance-copy">当前背景键名可手动修改为媒体库里的任意图片键名，方便复用已有资源。</p>
-			</div>
-		</div>
-		${
-			settings.backgroundImageKey
-				? `<form method="post" action="/api/admin/appearance/background/clear" class="appearance-panel" data-confirm-message="${escapeAttribute("确认移除当前背景图吗？")}">
-						<input type="hidden" name="_csrf" value="${escapeAttribute(csrfToken)}" />
-						<h2>移除背景图</h2>
-						<p class="appearance-copy">仅解除前台背景图引用，不会删除 R2 里的原始文件。</p>
-						<button type="submit" class="btn btn-danger">移除当前背景</button>
-					</form>`
-				: ""
-		}
 		<form method="post" action="/api/admin/appearance" class="appearance-grid appearance-form-grid">
 			<input type="hidden" name="_csrf" value="${escapeAttribute(csrfToken)}" />
 			<div class="appearance-stack">
 				<section class="appearance-panel">
-					<h2>背景图引用</h2>
+					<h2>背景图管理</h2>
+					<div class="appearance-stack">
+						<div class="appearance-upload-form">
+							<input type="file" name="file" accept="${escapeAttribute(getAllowedMediaAcceptValue())}" data-appearance-upload-input />
+							<button
+								type="submit"
+								class="btn btn-primary"
+								formaction="/api/admin/appearance/background/upload"
+								formmethod="post"
+							>
+								上传并设为当前背景
+							</button>
+						</div>
+					</div>
 					<div class="form-group">
 						<label for="backgroundImageKey">背景图键名</label>
 						<input
@@ -436,6 +435,23 @@ function renderAppearancePage(options: {
 							placeholder="appearance/background/2026-03-07/xxxx.webp"
 						/>
 					</div>
+					<p class="appearance-copy">上传和移除只影响“当前引用”，不会删除媒体库里的原始文件。</p>
+					${
+						settings.backgroundImageKey
+							? `<div class="appearance-background-actions">
+									<button
+										type="submit"
+										class="btn"
+										formaction="/api/admin/appearance/background/clear"
+										formmethod="post"
+										data-confirm-message="${escapeAttribute("确认移除当前背景图引用吗？")}"
+										formnovalidate
+									>
+										移除当前引用
+									</button>
+								</div>`
+							: ""
+					}
 				</section>
 				<section class="appearance-panel">
 					<div class="appearance-list-head">

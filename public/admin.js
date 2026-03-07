@@ -430,6 +430,15 @@ for (const form of document.querySelectorAll("form[data-confirm-message]")) {
 	});
 }
 
+for (const button of document.querySelectorAll("button[data-confirm-message]")) {
+	button.addEventListener("click", (event) => {
+		const message = button.getAttribute("data-confirm-message");
+		if (message && !window.confirm(message)) {
+			event.preventDefault();
+		}
+	});
+}
+
 function syncDynamicLinkRemoveButtons(list) {
 	if (!(list instanceof HTMLElement)) {
 		return;
