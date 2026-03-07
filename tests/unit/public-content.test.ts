@@ -73,4 +73,19 @@ describe("源码回归保护", () => {
 		assert.match(themeScriptSource, /closest\("\.theme-toggle"\)/u);
 		assert.match(mediaRouteSource, /buildProtectedAssetHeaders/u);
 	});
+
+	test("文章卡片封面不再被额外高斯遮罩并保持满高显示", async () => {
+		const postCardSource = await readFile(
+			"src/components/PostCard.astro",
+			"utf8",
+		);
+
+		assert.ok(!postCardSource.includes("transform: scale(0.88);"));
+		assert.ok(
+			!postCardSource.includes(
+				"backdrop-filter: blur(var(--post-card-cover-blur-effective))",
+			),
+		);
+		assert.match(postCardSource, /object-position: center;/u);
+	});
 });
