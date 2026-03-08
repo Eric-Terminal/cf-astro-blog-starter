@@ -146,7 +146,7 @@ describe("源码回归保护", () => {
 		assert.ok(source.includes("调整标签（已选"));
 	});
 
-	test("文章详情页支持左侧作者信息栏并读取外观设置", async () => {
+	test("文章详情页支持左侧作者信息栏、目录导航并读取外观设置", async () => {
 		const [postLayoutSource, postPageSource] = await Promise.all([
 			readFile("src/layouts/Post.astro", "utf8"),
 			readFile("src/pages/blog/[slug].astro", "utf8"),
@@ -154,7 +154,11 @@ describe("源码回归保护", () => {
 
 		assert.ok(postLayoutSource.includes("article-sidebar"));
 		assert.ok(postLayoutSource.includes("article-profile-avatar"));
+		assert.ok(postLayoutSource.includes("article-toc"));
+		assert.ok(postLayoutSource.includes("orientation: portrait"));
 		assert.ok(postPageSource.includes("articleSidebarAvatarPath"));
 		assert.ok(postPageSource.includes("getSiteAppearance"));
+		assert.ok(postPageSource.includes("renderSafeMarkdownWithToc"));
+		assert.ok(postPageSource.includes("toc={toc}"));
 	});
 });

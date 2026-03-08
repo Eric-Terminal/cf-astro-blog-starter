@@ -1,6 +1,7 @@
 ---
 import CommentsPanel from "@/components/CommentsPanel.astro";
 import { formatDate } from "@/lib/format";
+import type { MarkdownTocItem } from "@/lib/security";
 import Base from "./Base.astro";
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
 	articleSidebarName?: string;
 	articleSidebarBadge?: string;
 	articleSidebarBio?: string;
+	toc?: MarkdownTocItem[];
 }
 
 const {
@@ -31,6 +33,7 @@ const {
 	articleSidebarName,
 	articleSidebarBadge,
 	articleSidebarBio,
+	toc,
 } = Astro.props;
 
 const formattedDate = publishedAt ? formatDate(publishedAt) : null;
@@ -38,6 +41,16 @@ const sidebarName = articleSidebarName?.trim() || authorName?.trim() || "博主"
 const sidebarBadge = articleSidebarBadge?.trim() || "文章作者";
 const sidebarBio = articleSidebarBio?.trim() || "在这里记录技术、生活和折腾。";
 const sidebarAvatarInitial = sidebarName.slice(0, 1).toUpperCase();
+const tocEntries = (toc ?? [])
+	.map((item) => ({
+		...item,
+		level:
+			Number.isInteger(item.level) && item.level >= 2 && item.level <= 4
+				? item.level
+				: 2,
+		text: item.text.trim(),
+	}))
+	.filter((item) => item.id && item.text);
 ---
 
 <Base title={title} description={description} image={image} canonicalUrl={canonicalUrl}>
@@ -77,6 +90,23 @@ const sidebarAvatarInitial = sidebarName.slice(0, 1).toUpperCase();
 					)}
 				</div>
 			</section>
+			{tocEntries.length > 0 && (
+				<nav class="article-toc glass-panel" aria-label="文章目录">
+					<div class="article-toc-head">
+						<span aria-hidden="true">TOC</span>
+						<strong>Content</strong>
+					</div>
+					<ol class="article-toc-list">
+						{tocEntries.map((item) => (
+							<li class={`article-toc-item level-${item.level}`}>
+								<a href={`#${item.id}`} class="article-toc-link">
+									{item.text}
+								</a>
+							</li>
+						))}
+					</ol>
+				</nav>
+			)}
 		</aside>
 		<div class="article-main">
 			<header class="article-hero glass-panel" transition:name={`card-${slug}`}>
@@ -120,6 +150,8 @@ const sidebarAvatarInitial = sidebarName.slice(0, 1).toUpperCase();
 	.article-sidebar {
 		position: sticky;
 		top: 6.2rem;
+		display: grid;
+		gap: 0.8rem;
 	}
 
 	.article-profile {
@@ -206,6 +238,74 @@ const sidebarAvatarInitial = sidebarName.slice(0, 1).toUpperCase();
 		color: var(--color-text);
 	}
 
+	.article-toc {
+		display: grid;
+		gap: 0.9rem;
+		padding: 1rem;
+	}
+
+	.article-toc-head {
+		display: flex;
+		align-items: center;
+		gap: 0.58rem;
+		color: var(--color-text-secondary);
+	}
+
+	.article-toc-head span {
+		font-size: 1rem;
+		line-height: 1;
+	}
+
+	.article-toc-head strong {
+		font-size: 1.8rem;
+		line-height: 1;
+		letter-spacing: -0.02em;
+		font-family: "Iowan Old Style", "Times New Roman", serif;
+	}
+
+	.article-toc-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 0.38rem;
+	}
+
+	.article-toc-item {
+		margin: 0;
+	}
+
+	.article-toc-item.level-3 {
+		padding-left: 0.8rem;
+	}
+
+	.article-toc-item.level-4 {
+		padding-left: 1.4rem;
+	}
+
+	.article-toc-link {
+		display: block;
+		padding: 0.36rem 0.5rem;
+		border-left: 2px solid transparent;
+		border-radius: 0.36rem;
+		line-height: 1.45;
+		color: var(--color-text-secondary);
+		transition:
+			color var(--duration-normal) ease,
+			background-color var(--duration-normal) ease,
+			border-color var(--duration-normal) ease;
+	}
+
+	.article-toc-link:hover {
+		color: var(--color-text);
+		border-left-color: var(--color-accent);
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.article-prose :is(h1, h2, h3, h4, h5, h6)[id] {
+		scroll-margin-top: 6.2rem;
+	}
+
 	.article-hero,
 	.article-body {
 		padding: clamp(1.4rem, 1rem + 2vw, 2.5rem);
@@ -268,10 +368,21 @@ const sidebarAvatarInitial = sidebarName.slice(0, 1).toUpperCase();
 		.article-sidebar {
 			position: static;
 			top: auto;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 
 		.article-profile-avatar-frame {
 			width: min(12rem, 100%);
+		}
+	}
+
+	@media (max-width: 900px), (orientation: portrait) and (max-width: 1180px) {
+		.article-shell {
+			grid-template-columns: 1fr;
+		}
+
+		.article-sidebar {
+			display: none;
 		}
 	}
 </style>

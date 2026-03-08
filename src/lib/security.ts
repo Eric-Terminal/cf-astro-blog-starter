@@ -211,6 +211,17 @@ interface SpoilerShortcodeBlock {
 	content: string;
 }
 
+export interface MarkdownTocItem {
+	id: string;
+	text: string;
+	level: number;
+}
+
+interface MarkdownRenderState {
+	toc: MarkdownTocItem[];
+	headingSlugCount: Map<string, number>;
+}
+
 function extractDetailsShortcodes(markdown: string): {
 	markdown: string;
 	blocks: DetailsShortcodeBlock[];
@@ -289,13 +300,62 @@ function escapeRegExp(value: string): string {
 	return value.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function buildHeadingSlug(rawText: string): string {
+	const normalized = rawText
+		.normalize("NFKD")
+		.replaceAll(/[\u0300-\u036f]/g, "")
+		.toLowerCase()
+		.replaceAll(/<[^>]*>/g, " ")
+		.replaceAll(/&[a-zA-Z0-9#]+;/g, " ")
+		.replaceAll(/[^a-z0-9\u4e00-\u9fff\s-]/g, "")
+		.trim()
+		.replaceAll(/\s+/g, "-")
+		.replaceAll(/-+/g, "-")
+		.replaceAll(/^-+|-+$/g, "");
+
+	return normalized || "section";
+}
+
+function buildUniqueHeadingId(
+	baseSlug: string,
+	headingSlugCount: Map<string, number>,
+): string {
+	const currentCount = headingSlugCount.get(baseSlug) ?? 0;
+	headingSlugCount.set(baseSlug, currentCount + 1);
+
+	if (currentCount === 0) {
+		return baseSlug;
+	}
+
+	return `${baseSlug}-${currentCount + 1}`;
+}
+
 export async function renderSafeMarkdown(markdown: string): Promise<string> {
-	return renderSafeMarkdownInternal(markdown, 0);
+	const rendered = await renderSafeMarkdownWithToc(markdown);
+	return rendered.html;
+}
+
+export async function renderSafeMarkdownWithToc(markdown: string): Promise<{
+	html: string;
+	toc: MarkdownTocItem[];
+}> {
+	const state: MarkdownRenderState = {
+		toc: [],
+		headingSlugCount: new Map<string, number>(),
+	};
+
+	const html = await renderSafeMarkdownInternal(markdown, 0, state);
+
+	return {
+		html,
+		toc: state.toc,
+	};
 }
 
 async function renderSafeMarkdownInternal(
 	markdown: string,
 	depth: number,
+	state: MarkdownRenderState,
 ): Promise<string> {
 	if (depth > 5) {
 		return escapeHtml(markdown);
@@ -335,6 +395,30 @@ async function renderSafeMarkdownInternal(
 		return `<img src="${escapeAttribute(href)}" alt="${escapeAttribute(String(token.text ?? ""))}"${title} loading="lazy" decoding="async" />`;
 	};
 
+	renderer.heading = function (token: Tokens.Heading) {
+		const depthLevel = Number(token.depth);
+		const level =
+			Number.isInteger(depthLevel) && depthLevel >= 1 && depthLevel <= 6
+				? depthLevel
+				: 2;
+		const headingText = sanitizePlainText(token.text ?? "", 160);
+		const baseSlug = buildHeadingSlug(
+			headingText || `section-${state.toc.length + 1}`,
+		);
+		const headingId = buildUniqueHeadingId(baseSlug, state.headingSlugCount);
+
+		if (level >= 2 && level <= 4 && headingText) {
+			state.toc.push({
+				id: headingId,
+				text: headingText,
+				level,
+			});
+		}
+
+		const innerHtml = this.parser.parseInline(token.tokens ?? []);
+		return `<h${level} id="${escapeAttribute(headingId)}">${innerHtml}</h${level}>`;
+	};
+
 	const extracted = extractDetailsShortcodes(markdown);
 	const extractedSpoilers = extractSpoilerShortcodes(extracted.markdown);
 	const rendered = marked.parse(extractedSpoilers.markdown, {
@@ -354,6 +438,7 @@ async function renderSafeMarkdownInternal(
 		const innerHtml = await renderSafeMarkdownInternal(
 			block.content,
 			depth + 1,
+			state,
 		);
 		const detailsHtml = `<details class="prose-details"><summary>${escapeHtml(block.summary)}</summary>${innerHtml}</details>`;
 		const placeholderPattern = escapeRegExp(block.placeholder);

@@ -4,7 +4,7 @@ import { blogCategories, blogPosts } from "@/db/schema";
 import Post from "@/layouts/Post.astro";
 import { getDb } from "@/lib/db";
 import { getPublicPostBySlugCondition } from "@/lib/public-content";
-import { renderSafeMarkdown } from "@/lib/security";
+import { renderSafeMarkdownWithToc } from "@/lib/security";
 import {
 	DEFAULT_SITE_APPEARANCE,
 	getSiteAppearance,
@@ -73,7 +73,9 @@ if (!post) {
 	return Astro.redirect("/blog");
 }
 
-const htmlContent = await renderSafeMarkdown(post.content);
+const { html: htmlContent, toc } = await renderSafeMarkdownWithToc(
+	post.content,
+);
 const featuredImageUrl = post.featuredImageKey
 	? `/media/${post.featuredImageKey}`
 	: undefined;
@@ -92,6 +94,7 @@ const featuredImageUrl = post.featuredImageKey
 	articleSidebarName={siteAppearance.articleSidebarName}
 	articleSidebarBadge={siteAppearance.articleSidebarBadge}
 	articleSidebarBio={siteAppearance.articleSidebarBio}
+	toc={toc}
 >
 	<Fragment set:html={htmlContent} />
 </Post>

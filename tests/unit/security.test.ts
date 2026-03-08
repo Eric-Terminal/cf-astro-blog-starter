@@ -6,7 +6,11 @@ import {
 	isLegacyPasswordHash,
 	verifyPassword,
 } from "../../src/lib/password";
-import { buildUrlSlug, renderSafeMarkdown } from "../../src/lib/security";
+import {
+	buildUrlSlug,
+	renderSafeMarkdown,
+	renderSafeMarkdownWithToc,
+} from "../../src/lib/security";
 
 describe("安全工具", () => {
 	test("renderSafeMarkdown 会转义原始 HTML ", async () => {
@@ -14,7 +18,7 @@ describe("安全工具", () => {
 			'# 标题\n<script>alert("xss")</script>',
 		);
 
-		assert.match(html, /<h1>标题<\/h1>/u);
+		assert.match(html, /<h1 id="标题">标题<\/h1>/u);
 		assert.ok(!html.includes("<script>"));
 		assert.ok(html.includes("&lt;script&gt;alert"));
 	});
@@ -84,6 +88,34 @@ describe("安全工具", () => {
 
 		assert.ok(!html.includes("<img"));
 		assert.match(html, /&lt;img src=x onerror=alert\(1\)&gt;/u);
+	});
+
+	test("renderSafeMarkdownWithToc 会返回标题目录并注入锚点 id", async () => {
+		const { html, toc } = await renderSafeMarkdownWithToc(
+			"# 页面标题\n\n## 近况\n文本\n\n### 开发体验\n更多文本",
+		);
+
+		assert.match(html, /<h2 id="近况">近况<\/h2>/u);
+		assert.match(html, /<h3 id="开发体验">开发体验<\/h3>/u);
+		assert.equal(toc.length, 2);
+		assert.deepEqual(toc[0], { id: "近况", text: "近况", level: 2 });
+		assert.deepEqual(toc[1], {
+			id: "开发体验",
+			text: "开发体验",
+			level: 3,
+		});
+	});
+
+	test("renderSafeMarkdownWithToc 会为重复标题追加序号", async () => {
+		const { html, toc } = await renderSafeMarkdownWithToc(
+			"## 重复标题\n内容 A\n\n## 重复标题\n内容 B",
+		);
+
+		assert.match(html, /<h2 id="重复标题">重复标题<\/h2>/u);
+		assert.match(html, /<h2 id="重复标题-2">重复标题<\/h2>/u);
+		assert.equal(toc.length, 2);
+		assert.equal(toc[0]?.id, "重复标题");
+		assert.equal(toc[1]?.id, "重复标题-2");
 	});
 
 	test("verifyPassword 支持新的 PBKDF2 哈希", async () => {
