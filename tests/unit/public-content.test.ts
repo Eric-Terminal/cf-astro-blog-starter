@@ -145,4 +145,16 @@ describe("源码回归保护", () => {
 		assert.ok(source.includes("search-selected-chip"));
 		assert.ok(source.includes("调整标签（已选"));
 	});
+
+	test("文章详情页支持左侧作者信息栏并读取外观设置", async () => {
+		const [postLayoutSource, postPageSource] = await Promise.all([
+			readFile("src/layouts/Post.astro", "utf8"),
+			readFile("src/pages/blog/[slug].astro", "utf8"),
+		]);
+
+		assert.ok(postLayoutSource.includes("article-sidebar"));
+		assert.ok(postLayoutSource.includes("article-profile-avatar"));
+		assert.ok(postPageSource.includes("articleSidebarAvatarPath"));
+		assert.ok(postPageSource.includes("getSiteAppearance"));
+	});
 });

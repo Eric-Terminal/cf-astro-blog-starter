@@ -5,6 +5,10 @@ import Post from "@/layouts/Post.astro";
 import { getDb } from "@/lib/db";
 import { getPublicPostBySlugCondition } from "@/lib/public-content";
 import { renderSafeMarkdown } from "@/lib/security";
+import {
+	DEFAULT_SITE_APPEARANCE,
+	getSiteAppearance,
+} from "@/lib/site-appearance";
 
 const { slug } = Astro.params;
 
@@ -25,10 +29,12 @@ let post: {
 	featuredImageAlt: string | null;
 	categoryName: string | null;
 } | null = null;
+let siteAppearance = DEFAULT_SITE_APPEARANCE;
 
 try {
 	const { env } = Astro.locals.runtime;
 	const db = getDb(env.DB);
+	siteAppearance = await getSiteAppearance(db);
 
 	const [row] = await db
 		.select({
@@ -82,6 +88,10 @@ const featuredImageUrl = post.featuredImageKey
 	publishedAt={post.publishedAt || undefined}
 	authorName={post.authorName || undefined}
 	categoryName={post.categoryName || undefined}
+	articleSidebarAvatarPath={siteAppearance.articleSidebarAvatarPath || undefined}
+	articleSidebarName={siteAppearance.articleSidebarName}
+	articleSidebarBadge={siteAppearance.articleSidebarBadge}
+	articleSidebarBio={siteAppearance.articleSidebarBio}
 >
 	<Fragment set:html={htmlContent} />
 </Post>

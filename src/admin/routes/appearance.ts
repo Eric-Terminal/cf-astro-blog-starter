@@ -405,7 +405,7 @@ function renderAppearancePage(options: {
 		</style>
 		${alertHtml}
 		<h1>站点外观</h1>
-		<p class="appearance-copy">这里统一控制前台背景、顶部状态栏、导航索引链接和首页首屏文案。</p>
+		<p class="appearance-copy">这里统一控制前台背景、顶部状态栏、导航索引链接、首页首屏和文章页侧栏信息。</p>
 		<form method="post" action="/api/admin/appearance" class="appearance-grid appearance-form-grid" data-appearance-form="true">
 			<input type="hidden" name="_csrf" value="${escapeAttribute(csrfToken)}" />
 			<div class="appearance-stack">
@@ -751,6 +751,45 @@ function renderAppearancePage(options: {
 					</div>
 				</section>
 				<section class="appearance-panel">
+					<h2>文章页左侧信息栏</h2>
+					<div class="form-group">
+						<label for="articleSidebarAvatarPath">头像路径（可选）</label>
+						<input
+							id="articleSidebarAvatarPath"
+							name="articleSidebarAvatarPath"
+							class="form-input appearance-key-input"
+							value="${escapeAttribute(settings.articleSidebarAvatarPath ?? "")}"
+							maxlength="320"
+							placeholder="/media/appearance/profile/avatar.webp"
+						/>
+						<p class="appearance-note">支持 /media/...、站内绝对路径或 https:// 外链。</p>
+					</div>
+					<div class="form-group">
+						<label for="articleSidebarName">侧栏名称</label>
+						<input
+							id="articleSidebarName"
+							name="articleSidebarName"
+							class="form-input"
+							value="${escapeAttribute(settings.articleSidebarName)}"
+							maxlength="36"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="articleSidebarBadge">侧栏徽标文案</label>
+						<input
+							id="articleSidebarBadge"
+							name="articleSidebarBadge"
+							class="form-input"
+							value="${escapeAttribute(settings.articleSidebarBadge)}"
+							maxlength="24"
+						/>
+					</div>
+					<div class="form-group">
+						<label for="articleSidebarBio">侧栏简介</label>
+						<textarea id="articleSidebarBio" name="articleSidebarBio" class="form-textarea" maxlength="320">${escapeHtml(settings.articleSidebarBio)}</textarea>
+					</div>
+				</section>
+				<section class="appearance-panel">
 					<div class="appearance-actions">
 						<button type="submit" class="btn btn-primary">保存外观设置</button>
 						<a href="/api/admin/media" class="btn">打开媒体库</a>
@@ -866,6 +905,10 @@ appearance.post("/", async (c) => {
 		heroSignalChip1: getBodyText(body, "heroSignalChip1"),
 		heroSignalChip2: getBodyText(body, "heroSignalChip2"),
 		heroSignalChip3: getBodyText(body, "heroSignalChip3"),
+		articleSidebarAvatarPath: getBodyText(body, "articleSidebarAvatarPath"),
+		articleSidebarName: getBodyText(body, "articleSidebarName"),
+		articleSidebarBadge: getBodyText(body, "articleSidebarBadge"),
+		articleSidebarBio: getBodyText(body, "articleSidebarBio"),
 	});
 
 	return c.redirect("/api/admin/appearance?status=saved");

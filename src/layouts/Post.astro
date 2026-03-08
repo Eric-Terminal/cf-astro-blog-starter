@@ -12,6 +12,10 @@ interface Props {
 	publishedAt?: string;
 	authorName?: string;
 	categoryName?: string;
+	articleSidebarAvatarPath?: string;
+	articleSidebarName?: string;
+	articleSidebarBadge?: string;
+	articleSidebarBio?: string;
 }
 
 const {
@@ -23,41 +27,183 @@ const {
 	publishedAt,
 	authorName,
 	categoryName,
+	articleSidebarAvatarPath,
+	articleSidebarName,
+	articleSidebarBadge,
+	articleSidebarBio,
 } = Astro.props;
 
 const formattedDate = publishedAt ? formatDate(publishedAt) : null;
+const sidebarName = articleSidebarName?.trim() || authorName?.trim() || "博主";
+const sidebarBadge = articleSidebarBadge?.trim() || "文章作者";
+const sidebarBio = articleSidebarBio?.trim() || "在这里记录技术、生活和折腾。";
+const sidebarAvatarInitial = sidebarName.slice(0, 1).toUpperCase();
 ---
 
 <Base title={title} description={description} image={image} canonicalUrl={canonicalUrl}>
 	<article class="article-shell">
-		<header class="article-hero glass-panel" transition:name={`card-${slug}`}>
-			<a href="/blog" class="article-back">返回归档</a>
-			<div class="article-kicker">精选文章</div>
-			<h1 class="article-title" transition:name={`title-${slug}`}>{title}</h1>
-			{description && (
-				<p class="article-summary" transition:name={`summary-${slug}`}>
-					{description}
-				</p>
-			)}
-			<div class="pill-row" transition:name={`meta-${slug}`}>
-				{formattedDate && <time class="pill" datetime={publishedAt}>{formattedDate}</time>}
-				{authorName && <span class="pill">{authorName}</span>}
-				{categoryName && <span class="pill">{categoryName}</span>}
+		<aside class="article-sidebar">
+			<section class="article-profile glass-panel">
+				<div class="article-profile-avatar-frame">
+					{articleSidebarAvatarPath ? (
+						<img
+							src={articleSidebarAvatarPath}
+							alt={`${sidebarName} 的头像`}
+							class="article-profile-avatar"
+							loading="lazy"
+							decoding="async"
+						/>
+					) : (
+						<span class="article-profile-avatar-fallback" aria-hidden="true">
+							{sidebarAvatarInitial}
+						</span>
+					)}
+				</div>
+				<span class="article-profile-badge">{sidebarBadge}</span>
+				<strong class="article-profile-name">{sidebarName}</strong>
+				<p class="article-profile-bio">{sidebarBio}</p>
+				<div class="article-profile-meta">
+					{formattedDate && (
+						<div class="article-profile-item">
+							<span>发布时间</span>
+							<strong>{formattedDate}</strong>
+						</div>
+					)}
+					{categoryName && (
+						<div class="article-profile-item">
+							<span>文章分类</span>
+							<strong>{categoryName}</strong>
+						</div>
+					)}
+				</div>
+			</section>
+		</aside>
+		<div class="article-main">
+			<header class="article-hero glass-panel" transition:name={`card-${slug}`}>
+				<a href="/blog" class="article-back">返回归档</a>
+				<div class="article-kicker">精选文章</div>
+				<h1 class="article-title" transition:name={`title-${slug}`}>{title}</h1>
+				{description && (
+					<p class="article-summary" transition:name={`summary-${slug}`}>
+						{description}
+					</p>
+				)}
+				<div class="pill-row" transition:name={`meta-${slug}`}>
+					{formattedDate && <time class="pill" datetime={publishedAt}>{formattedDate}</time>}
+					{authorName && <span class="pill">{authorName}</span>}
+					{categoryName && <span class="pill">{categoryName}</span>}
+				</div>
+			</header>
+			<div class="article-body glass-panel">
+				<div class="prose article-prose">
+					<slot />
+				</div>
 			</div>
-		</header>
-		<div class="article-body glass-panel">
-			<div class="prose article-prose">
-				<slot />
-			</div>
+			<CommentsPanel />
 		</div>
-		<CommentsPanel />
 	</article>
 </Base>
 
 <style>
 	.article-shell {
 		display: grid;
+		grid-template-columns: minmax(13.5rem, 17rem) minmax(0, 1fr);
 		gap: var(--space-xl);
+		align-items: start;
+	}
+
+	.article-main {
+		display: grid;
+		gap: var(--space-xl);
+	}
+
+	.article-sidebar {
+		position: sticky;
+		top: 6.2rem;
+	}
+
+	.article-profile {
+		display: grid;
+		gap: 0.8rem;
+		padding: 1.05rem;
+	}
+
+	.article-profile-avatar-frame {
+		width: 100%;
+		aspect-ratio: 1 / 1;
+		border-radius: calc(var(--radius-inner) - 2px);
+		overflow: hidden;
+		background:
+			linear-gradient(145deg, rgba(10, 132, 255, 0.22), rgba(10, 132, 255, 0.06)),
+			rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		display: grid;
+		place-items: center;
+	}
+
+	.article-profile-avatar {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+	}
+
+	.article-profile-avatar-fallback {
+		font-size: clamp(2.2rem, 1.7rem + 1.8vw, 3rem);
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: var(--color-accent-hover);
+	}
+
+	.article-profile-badge {
+		width: fit-content;
+		padding: 0.34rem 0.68rem;
+		border-radius: var(--radius-pill);
+		background: rgba(10, 132, 255, 0.12);
+		border: 1px solid rgba(10, 132, 255, 0.2);
+		font-size: 0.74rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-accent-hover);
+	}
+
+	.article-profile-name {
+		font-size: 1.1rem;
+		line-height: 1.3;
+		color: var(--color-text);
+	}
+
+	.article-profile-bio {
+		font-size: 0.92rem;
+		line-height: 1.7;
+		color: var(--color-text-secondary);
+	}
+
+	.article-profile-meta {
+		display: grid;
+		gap: 0.55rem;
+	}
+
+	.article-profile-item {
+		display: grid;
+		gap: 0.2rem;
+		padding: 0.58rem 0.66rem;
+		border-radius: calc(var(--radius-inner) - 10px);
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.12);
+	}
+
+	.article-profile-item span {
+		font-size: 0.74rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+
+	.article-profile-item strong {
+		font-size: 0.9rem;
+		font-weight: 650;
+		color: var(--color-text);
 	}
 
 	.article-hero,
@@ -112,5 +258,20 @@ const formattedDate = publishedAt ? formatDate(publishedAt) : null;
 
 	.article-prose {
 		margin-inline: auto;
+	}
+
+	@media (max-width: 1024px) {
+		.article-shell {
+			grid-template-columns: 1fr;
+		}
+
+		.article-sidebar {
+			position: static;
+			top: auto;
+		}
+
+		.article-profile-avatar-frame {
+			width: min(12rem, 100%);
+		}
 	}
 </style>

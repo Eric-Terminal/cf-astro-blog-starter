@@ -104,6 +104,26 @@ describe("站点外观设置", () => {
 		assert.equal(normalized.heroSignalChip3, "卡片抬升");
 	});
 
+	test("normalizeSiteAppearanceInput 支持文章页左侧栏头像与简介", () => {
+		const normalized = normalizeSiteAppearanceInput({
+			articleSidebarAvatarPath: "appearance/profile/avatar.webp",
+			articleSidebarName: "Eric-Terminal",
+			articleSidebarBadge: "站点作者",
+			articleSidebarBio: "这里放作者简介，用于文章页左侧信息栏展示。",
+		});
+
+		assert.equal(
+			normalized.articleSidebarAvatarPath,
+			"/media/appearance/profile/avatar.webp",
+		);
+		assert.equal(normalized.articleSidebarName, "Eric-Terminal");
+		assert.equal(normalized.articleSidebarBadge, "站点作者");
+		assert.equal(
+			normalized.articleSidebarBio,
+			"这里放作者简介，用于文章页左侧信息栏展示。",
+		);
+	});
+
 	test("buildSiteNavLinks 会按顺序生成顶部导航数据", () => {
 		const links = buildSiteNavLinks(DEFAULT_SITE_APPEARANCE);
 
